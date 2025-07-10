@@ -3,15 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BeritaResource\Pages;
-use App\Filament\Resources\BeritaResource\RelationManagers;
 use App\Models\Berita;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BeritaResource extends Resource
 {
@@ -23,7 +24,25 @@ class BeritaResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('judul')
+                    ->required()
+                    ->maxLength(255),
+
+                TextInput::make('penulis')
+                    ->required()
+                    ->maxLength(255),
+
+                Textarea::make('isi')
+                    ->required()
+                    ->rows(8),
+
+                FileUpload::make('gambar')
+                    ->label('Gambar')
+                    ->image()
+                    ->directory('gambar-berita')
+                    ->imageEditor()
+                    ->preserveFilenames()
+                    ->imagePreviewHeight('200'),
             ]);
     }
 
@@ -31,11 +50,12 @@ class BeritaResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('judul')->searchable(),
+                Tables\Columns\TextColumn::make('penulis'),
+                Tables\Columns\ImageColumn::make('gambar')->circular(),
+                Tables\Columns\TextColumn::make('created_at')->dateTime(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -48,9 +68,7 @@ class BeritaResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
